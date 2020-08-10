@@ -1604,7 +1604,7 @@
 #define LIN_ADVANCE
 #if ENABLED(LIN_ADVANCE)
   //#define EXTRA_LIN_ADVANCE_K // Enable for second linear advance constants
-  #define LIN_ADVANCE_K 1.81    // Unit: mm compression per 1mm/s extruder speed
+  #define LIN_ADVANCE_K 0.47    // Unit: mm compression per 1mm/s extruder speed
   //#define LA_DEBUG            // If enabled, this will generate debug information output over USB.
   #define EXPERIMENTAL_SCURVE // Enable this option to permit S-Curve Acceleration
 #endif
@@ -1617,10 +1617,10 @@
  */
 #if EITHER(AUTO_BED_LEVELING_3POINT, AUTO_BED_LEVELING_UBL)
   //#define PROBE_PT_1_X 15
-  //#define PROBE_PT_1_Y 180
+  //#define PROBE_PT_1_Y 110
   //#define PROBE_PT_2_X 15
   //#define PROBE_PT_2_Y 20
-  //#define PROBE_PT_3_X 170
+  //#define PROBE_PT_3_X 110
   //#define PROBE_PT_3_Y 20
 #endif
 
@@ -1652,10 +1652,10 @@
 
 #if EITHER(MESH_BED_LEVELING, AUTO_BED_LEVELING_UBL)
   // Override the mesh area if the automatic (max) area is too large
-  //#define MESH_MIN_X MESH_INSET
-  //#define MESH_MIN_Y MESH_INSET
-  //#define MESH_MAX_X X_BED_SIZE - (MESH_INSET)
-  //#define MESH_MAX_Y Y_BED_SIZE - (MESH_INSET)
+  //#define MESH_MIN_X -155 // MESH_INSET
+  //#define MESH_MIN_Y -155 // MESH_INSET
+  //#define MESH_MAX_X 155 // X_BED_SIZE - (MESH_INSET)
+  //#define MESH_MAX_Y 155 // Y_BED_SIZE - (MESH_INSET)
 #endif
 
 /**
