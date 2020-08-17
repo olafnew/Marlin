@@ -490,9 +490,9 @@
   // If you are using a pre-configured hotend then you can use one of the value sets by uncommenting it
 
   // Ultimaker
-  #define DEFAULT_Kp 30.09
-  #define DEFAULT_Ki 1.75
-  #define DEFAULT_Kd 129.23
+  #define DEFAULT_Kp 22.1
+  #define DEFAULT_Ki 1.78
+  #define DEFAULT_Kd 68.4
 
   // MakerGear
   //#define DEFAULT_Kp 7.0
@@ -1320,8 +1320,8 @@
  */
 //#define AUTO_BED_LEVELING_3POINT
 //#define AUTO_BED_LEVELING_LINEAR
-#define AUTO_BED_LEVELING_BILINEAR
-//#define AUTO_BED_LEVELING_UBL
+//#define AUTO_BED_LEVELING_BILINEAR
+#define AUTO_BED_LEVELING_UBL
 //#define MESH_BED_LEVELING
 
 /**
@@ -1399,7 +1399,7 @@
 
   //#define MESH_EDIT_GFX_OVERLAY   // Display a graphics overlay while editing the mesh
 
-  #define MESH_INSET 0              // Set Mesh bounds as an inset region of the bed
+  #define MESH_INSET 5              // Set Mesh bounds as an inset region of the bed
   #define GRID_MAX_POINTS_X 6      // Don't use more than 15 points per axis, implementation limited.
   #define GRID_MAX_POINTS_Y GRID_MAX_POINTS_X
 
