@@ -30,6 +30,10 @@
 
 #include "spindle_laser_types.h"
 
+#if USE_BEEPER
+  #include "../libs/buzzer.h"
+#endif
+
 #if ENABLED(LASER_POWER_INLINE)
   #include "../module/planner.h"
 #endif
@@ -90,6 +94,10 @@ public:
   static const cutter_power_t mpower_min() { return cpwr_to_upwr(SPEED_POWER_MIN); }
   static const cutter_power_t mpower_max() { return cpwr_to_upwr(SPEED_POWER_MAX); }
 
+  #if ENABLED(LASER_FEATURE)
+    static cutter_test_pulse_t testPulse; // Test fire Pulse ms value
+  #endif
+
   static bool isReady;                    // Ready to apply power setting from the UI to OCR
   static uint8_t power;
 
@@ -149,7 +157,7 @@ public:
         #elif CUTTER_UNIT_IS(RPM)
           2
         #else
-          #error "CUTTER_UNIT_IS(???)"
+          #error "CUTTER_UNIT_IS(unknown)"
         #endif
       ));
     }
@@ -207,8 +215,7 @@ public:
   static inline void disable() { isReady = false; set_enabled(false); }
 
   #if HAS_LCD_MENU
-
-    static inline void enable_with_dir(const bool reverse) {
+      static inline void enable_with_dir(const bool reverse) {
       isReady = true;
       const uint8_t ocr = TERN(SPINDLE_LASER_PWM, upower_to_ocr(menuPower), 255);
       if (menuPower)
@@ -230,7 +237,21 @@ public:
       }
     #endif
 
-  #endif
+    #if ENABLED(LASER_FEATURE)
+      /**
+       * Test fire the laser using the testPulse ms duration
+       * Also fires with any PWM power that was previous set
+       * If not set defaults to 80% power
+       */
+      static inline void test_fire_pulse() {
+        TERN_(USE_BEEPER, buzzer.tone(30, 3000));
+        enable_forward();                  // Turn Laser on (Spindle speak but same funct)
+        delay(testPulse);                  // Delay for time set by user in pulse ms menu screen.
+        disable();                         // Turn laser off
+      }
+    #endif
+
+  #endif // HAS_LCD_MENU
 
   #if ENABLED(LASER_POWER_INLINE)
     /**

@@ -313,7 +313,7 @@ void MarlinUI::init_lcd() {
   t = 0;
   #if ENABLED(TFTGLCD_PANEL_SPI)
     // SPI speed must be less 10MHz
-    _SET_OUTPUT(TFTGLCD_CS);
+    SET_OUTPUT(TFTGLCD_CS);
     WRITE(TFTGLCD_CS, HIGH);
     spiInit(TERN(__STM32F1__, SPI_QUARTER_SPEED, SPI_FULL_SPEED));
     WRITE(TFTGLCD_CS, LOW);
@@ -434,33 +434,32 @@ FORCE_INLINE void _draw_heater_status(const heater_id_t heater_id, const char *p
   uint8_t pic_hot_bits;
   #if HAS_HEATED_BED
     const bool isBed = heater_id < 0;
-    const float t1 = (isBed ? thermalManager.degBed() : thermalManager.degHotend(heater_id));
-    const float t2 = (isBed ? thermalManager.degTargetBed() : thermalManager.degTargetHotend(heater_id));
+    const celsius_t t1 = (isBed ? thermalManager.degBed() : thermalManager.degHotend(heater_id)),
+                    t2 = (isBed ? thermalManager.degTargetBed() : thermalManager.degTargetHotend(heater_id));
   #else
-    const float t1 = thermalManager.degHotend(heater_id);
-    const float t2 = thermalManager.degTargetHotend(heater_id);
+    const celsius_t t1 = thermalManager.degHotend(heater_id), t2 = thermalManager.degTargetHotend(heater_id);
   #endif
 
   #if HOTENDS < 2
     if (heater_id == H_E0) {
       lcd.setCursor(2, 5);  lcd.print(prefix); //HE
-      lcd.setCursor(1, 6);  lcd.print(i16tostr3rj(t1 + 0.5));
+      lcd.setCursor(1, 6);  lcd.print(i16tostr3rj(t1));
       lcd.setCursor(1, 7);
     }
     else {
       lcd.setCursor(6, 5);  lcd.print(prefix); //BED
-      lcd.setCursor(6, 6);  lcd.print(i16tostr3rj(t1 + 0.5));
+      lcd.setCursor(6, 6);  lcd.print(i16tostr3rj(t1));
       lcd.setCursor(6, 7);
     }
   #else
     if (heater_id > H_BED) {
-      lcd.setCursor(heater_id * 4, 5);  lcd.print(prefix); //HE1 or HE2 or HE3
-      lcd.setCursor(heater_id * 4, 6);  lcd.print(i16tostr3rj(t1 + 0.5));
+      lcd.setCursor(heater_id * 4, 5);  lcd.print(prefix); // HE1 or HE2 or HE3
+      lcd.setCursor(heater_id * 4, 6);  lcd.print(i16tostr3rj(t1));
       lcd.setCursor(heater_id * 4, 7);
     }
     else {
       lcd.setCursor(13, 5);  lcd.print(prefix); //BED
-      lcd.setCursor(13, 6);  lcd.print(i16tostr3rj(t1 + 0.5));
+      lcd.setCursor(13, 6);  lcd.print(i16tostr3rj(t1));
       lcd.setCursor(13, 7);
     }
   #endif // HOTENDS <= 1
@@ -475,7 +474,7 @@ FORCE_INLINE void _draw_heater_status(const heater_id_t heater_id, const char *p
     }
     else
   #endif // !HEATER_IDLE_HANDLER
-      lcd.print(i16tostr3rj(t2 + 0.5));
+      lcd.print(i16tostr3rj(t2));
 
   switch (heater_id) {
     case H_BED: pic_hot_bits = ICON_BED;   break;
@@ -761,7 +760,7 @@ void MarlinUI::draw_status_screen() {
     #endif
   #endif // HAS_HEATED_BED
 
-  #if FAN_COUNT > 0
+  #if HAS_FAN
     uint16_t spd = thermalManager.fan_speed[0];
 
     #if ENABLED(ADAPTIVE_FAN_SLOWING)
@@ -784,7 +783,7 @@ void MarlinUI::draw_status_screen() {
     else
       picBits &= ~ICON_FAN;
 
-  #endif // FAN_COUNT > 0
+  #endif // HAS_FAN
 
   //
   // Line 9, 10 - icons
@@ -855,13 +854,14 @@ void MarlinUI::draw_status_screen() {
   void MenuEditItemBase::draw_edit_screen(PGM_P const pstr, const char* const value/*=nullptr*/) {
     if (!PanelDetected) return;
     ui.encoder_direction_normal();
-    lcd.setCursor(0, MIDDLE_Y);
+    const uint8_t y = TERN0(AUTO_BED_LEVELING_UBL, ui.external_control) ? LCD_HEIGHT - 1 : MIDDLE_Y;
+    lcd.setCursor(0, y);
     lcd.write(COLOR_EDIT);
     lcd_put_u8str_P(pstr);
     if (value) {
       lcd.write(':');
-      lcd.setCursor((LCD_WIDTH - 1) - (utf8_strlen(value) + 1), MIDDLE_Y);  // Right-justified, padded by spaces
-      lcd.write(' ');     // Overwrite char if value gets shorter
+      lcd.setCursor((LCD_WIDTH - 1) - (utf8_strlen(value) + 1), y); // Right-justified, padded by spaces
+      lcd.write(' ');                                               // Overwrite char if value gets shorter
       lcd.print(value);
       lcd.write(' ');
       lcd.print_line();
